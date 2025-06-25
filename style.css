@@ -533,197 +533,262 @@ body {
     color: #fff;
     margin-top: 0;
     margin-bottom: 15px;
+    font-size: 1.1em;
     border-bottom: 1px solid #40444b;
     padding-bottom: 10px;
-    font-size: 1.1em;
 }
 
 .settings-group p {
-    color: #dcddde;
     margin-bottom: 10px;
-    font-size: 0.95em;
+    color: #dcddde;
 }
 
-.settings-group p span {
-    font-weight: 600;
-    color: #fff;
+.setting-item {
+    margin-bottom: 15px;
 }
 
-/* Auth Overlay and Modals */
+.setting-item label {
+    display: block;
+    margin-bottom: 8px;
+    color: #dcddde;
+    font-weight: 500;
+}
+
+/* Authentication Overlay and Modal */
 .auth-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    backdrop-filter: blur(5px);
-    display: none; /* Hidden by default */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .auth-overlay.active {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
 }
 
 .auth-modal {
     background-color: #2f3136;
-    padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    width: 400px;
-    text-align: center;
-    position: relative;
-    animation: popIn 0.3s ease-out;
-}
-
-@keyframes popIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.auth-modal h2 {
-    color: #fff;
-    margin-bottom: 25px;
-    font-size: 1.8em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    width: 90%; /* Responsive width */
+    max-width: 400px; /* Max width for larger screens */
+    overflow: hidden;
 }
 
 .auth-tabs {
     display: flex;
-    margin-bottom: 25px;
     border-bottom: 1px solid #40444b;
 }
 
-.auth-tab {
+.tab-button {
     flex: 1;
-    padding: 12px 0;
-    background-color: transparent;
-    border: none;
+    padding: 15px 0;
+    background-color: #202225;
     color: #8e9297;
-    font-size: 1.1em;
-    font-weight: 500;
+    border: none;
     cursor: pointer;
-    transition: color 0.2s ease;
-    position: relative;
-    overflow: hidden; /* For underline effect */
+    font-size: 1.1em;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.auth-tab:hover {
+.tab-button.active {
+    background-color: #2f3136;
+    color: #fff;
+    border-bottom: 2px solid #5865f2; /* Active tab indicator */
+}
+
+.tab-button:hover:not(.active) {
+    background-color: #36393f;
     color: #dcddde;
 }
 
-.auth-tab.active {
-    color: #fff;
-}
-
-.auth-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px; /* Overlap with border */
-    left: 0;
-    width: 100%;
-    background-color: #5865f2;
-    animation: tabUnderline 0.3s forwards;
-    height: 3px; /* Ensure height is set */
-}
-
-
-@keyframes tabUnderline {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
-}
-
-
 .auth-form-container {
-    display: none;
-    animation: fadeIn 0.3s ease-out;
+    padding: 25px;
+    display: none; /* Hidden by default */
 }
 
 .auth-form-container.active {
     display: block;
 }
 
-/* Adjust form-group in auth modal for better spacing */
-.auth-modal .form-group {
-    text-align: left;
+/* Chart Styles */
+#transactionChartContainer {
+    position: relative;
+    height: 40vh; /* Responsive height for the chart */
+    width: 100%;
+    background-color: #2f3136;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    display: flex; /* Use flex to center message if no data */
+    justify-content: center;
+    align-items: center;
+    color: #aaa; /* Color for no data message */
 }
 
-/* Responsive Adjustments */
+#transactionChart {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+
+/* --- Mobile Responsiveness (New/Improved) --- */
 @media (max-width: 768px) {
+    body {
+        min-height: 100vh; /* Ensure body takes full viewport height on mobile */
+        overflow-y: auto; /* Allow scrolling on body if content overflows */
+    }
+
     .app-container {
-        flex-direction: column;
-        width: 100vw;
-        height: 100vh;
-        border-radius: 0;
+        flex-direction: column; /* Stack sidebar and main content vertically */
+        width: 100vw; /* Take full width of the viewport */
+        height: 100vh; /* Take full height of the viewport */
+        max-width: 100%; /* No max width */
+        max-height: 100%; /* No max height */
+        border-radius: 0; /* No border-radius on full screen */
     }
 
     .sidebar {
-        flex-direction: row;
-        width: 100%;
-        height: auto;
-        padding: 5px 0;
-        justify-content: center;
-        border-bottom: 1px solid #2f3136;
+        flex-direction: row; /* Sidebar icons arranged horizontally */
+        width: 100%; /* Take full width */
+        height: auto; /* Height adapts to content */
+        padding: 5px 0; /* Reduced padding */
+        justify-content: center; /* Center icons horizontally */
+        border-bottom: 1px solid #2f3136; /* Separator for sidebar */
     }
 
     .server-list {
-        flex-direction: row;
-        overflow-x: auto;
+        flex-direction: row; /* Icons in a row */
+        overflow-x: auto; /* Allow horizontal scrolling for many icons */
         padding: 5px;
-        justify-content: flex-start;
+        justify-content: flex-start; /* Align icons to the start */
         width: 100%;
     }
 
     .server-icon {
-        flex-shrink: 0; /* Prevent shrinking */
-        margin: 0 5px;
+        flex-shrink: 0; /* Prevent shrinking of icons */
+        margin: 0 5px; /* Spacing between icons */
     }
 
+    /* Adjust active indicator for horizontal sidebar */
     .server-icon.active::before {
-        height: 4px;
-        width: 80%;
-        top: auto;
-        bottom: -8px;
+        height: 4px; /* Shorter bar */
+        width: 80%; /* Wider bar */
+        top: auto; /* Position at the bottom */
+        bottom: -8px; /* Offset from bottom */
         left: 10%; /* Center it */
-        transform: none;
+        transform: none; /* No transform needed */
     }
 
     .server-icon.bottom-icon {
-        margin-top: 0;
+        margin-top: 0; /* Reset margin for horizontal layout */
     }
 
     .channel-list {
-        width: 100%;
-        height: auto;
-        border-bottom: 1px solid #202225;
-    }
-
-    .channels {
-        display: flex;
-        overflow-x: auto;
-        padding: 0 10px;
+        width: 100%; /* Take full width */
+        height: auto; /* Height adapts to content */
+        border-bottom: 1px solid #202225; /* Separator */
         padding-bottom: 10px;
     }
 
-    .channel {
-        flex-shrink: 0;
-        margin-right: 10px;
+    .channel-header {
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    .channels {
+        display: none; /* Hide channels list on mobile to save space */
     }
 
     .user-panel {
-        display: none; /* Hide on small screens to save space */
+        display: none; /* Hide user panel on mobile */
     }
 
     .main-content {
-        padding: 15px;
+        flex-grow: 1; /* Still takes available space */
+        padding: 15px; /* Reduced padding */
+        overflow-y: auto; /* Ensure scrolling */
+        height: calc(100vh - 72px); /* Adjust height based on new sidebar height */
     }
 
     .main-header {
-        flex-direction: column;
+        margin-bottom: 15px; /* Slightly less margin */
+        padding-bottom: 10px;
+    }
+
+    .view-section h3 {
+        font-size: 1.2em; /* Slightly smaller font for headings */
+    }
+
+    .balance-card {
+        padding: 20px; /* Reduced padding */
+        margin-bottom: 25px;
+    }
+
+    .balance-amount {
+        font-size: 2.2em; /* Smaller font for balance */
+    }
+
+    .quick-actions {
+        flex-direction: column; /* Stack action buttons vertically */
+        gap: 10px; /* Reduced gap */
+        margin-bottom: 25px;
+    }
+
+    .action-button {
+        width: 100%; /* Full width buttons */
+    }
+
+    .bank-form {
+        padding: 20px; /* Reduced padding */
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="password"],
+    .form-group input[type="file"] {
+        width: calc(100% - 24px); /* Adjust for padding and border */
+        padding: 10px 12px; /* Adjusted padding */
+    }
+
+    .submit-button {
+        padding: 10px 20px; /* Adjusted padding */
+        font-size: 1em; /* Smaller font */
+    }
+
+    .transaction-list-container {
+        padding: 10px; /* Reduced padding */
+    }
+
+    .transaction-item {
+        flex-direction: column; /* Stack info and amount vertically */
         align-items: flex-start;
-        gap: 10px;
+        gap: 5px; /* Space between stacked items */
+    }
+
+    .transaction-amount {
+        align-self: flex-end; /* Align amount to the right */
+        font-size: 1.1em; /* Make amount slightly larger for visibility */
+    }
+
+    .auth-modal {
+        width: 95%; /* Wider modal on mobile */
+    }
+    
+    #transactionChartContainer {
+        height: 30vh; /* Shorter chart on mobile */
+        padding: 10px;
+        margin-bottom: 15px;
     }
 }
