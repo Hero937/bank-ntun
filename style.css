@@ -1,0 +1,729 @@
+/* General Body and Font Styles */
+body {
+    margin: 0;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    background-color: #36393f; /* Discord dark background */
+    color: #dcddde; /* Light grey text for contrast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden; /* Hide scrollbars if content fits */
+}
+
+/* App Container */
+.app-container {
+    display: flex;
+    width: 95vw; /* Slightly less than full width */
+    height: 95vh; /* Slightly less than full height */
+    max-width: 1200px; /* Max width for larger screens */
+    max-height: 800px; /* Max height for larger screens */
+    background-color: #2f3136; /* Inner Discord background */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+/* Sidebar (Leftmost, Server Icons) */
+.sidebar {
+    width: 72px;
+    background-color: #202225; /* Darker sidebar */
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.server-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.server-icon {
+    width: 48px;
+    height: 48px;
+    background-color: #36393f;
+    border-radius: 50%; /* Circular icons */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #dcddde;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+}
+
+.server-icon:hover {
+    border-radius: 30%; /* Squircle effect on hover */
+    background-color: #5865f2; /* Discord brand color */
+    color: #fff;
+}
+
+.server-icon.active {
+    border-radius: 30%;
+    background-color: #5865f2;
+    color: #fff;
+}
+
+/* Active indicator for sidebar icons */
+.server-icon.active::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    width: 8px;
+    height: 80%;
+    background-color: #dcddde;
+    border-radius: 4px;
+}
+
+.server-icon.bottom-icon {
+    margin-top: auto; /* Pushes icons to the bottom */
+}
+
+
+/* Channel List (Second Column) */
+.channel-list {
+    width: 240px;
+    background-color: #2f3136;
+    display: flex;
+    flex-direction: column;
+    padding: 0 10px;
+}
+
+.channel-header {
+    padding: 15px 10px;
+    border-bottom: 1px solid #202225;
+    margin-bottom: 10px;
+}
+
+.channel-header h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.channels {
+    flex-grow: 1; /* Takes available space */
+    overflow-y: auto; /* Scroll for many channels */
+    padding-right: 5px; /* Space for scrollbar */
+}
+
+/* Custom Scrollbar for Channels */
+.channels::-webkit-scrollbar {
+    width: 8px;
+}
+
+.channels::-webkit-scrollbar-track {
+    background: #2f3136;
+}
+
+.channels::-webkit-scrollbar-thumb {
+    background-color: #202225;
+    border-radius: 4px;
+    border: 2px solid #2f3136;
+}
+
+.channel {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    color: #8e9297; /* Muted channel text */
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.channel:hover {
+    background-color: #393c43;
+    color: #dcddde;
+}
+
+.channel.active {
+    background-color: #40444b;
+    color: #fff;
+}
+
+.channel i {
+    margin-right: 8px;
+    font-size: 0.9em;
+}
+
+/* User Panel at the bottom of channel list */
+.user-panel {
+    background-color: #23272a;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    margin-top: auto; /* Pushes to the bottom */
+    margin-bottom: 10px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background-color: #5865f2; /* Placeholder background */
+}
+
+.user-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-info span {
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.user-info small {
+    color: #8e9297;
+    font-size: 0.75em;
+}
+
+.user-actions i {
+    color: #b9bbbe;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.user-actions i:hover {
+    background-color: #40444b;
+}
+
+/* Main Content Area */
+.main-content {
+    flex-grow: 1; /* Takes remaining space */
+    background-color: #36393f;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto; /* Scroll for content */
+}
+
+/* Custom Scrollbar for Main Content */
+.main-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: #36393f;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background-color: #2f3136;
+    border-radius: 4px;
+    border: 2px solid #36393f;
+}
+
+.main-header {
+    display: flex;
+    /* เปลี่ยนจาก justify-content: space-between; เพื่อให้ h2 ชิดซ้าย */
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #40444b;
+}
+
+.main-header h2 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.5em;
+}
+
+/* View Sections */
+.view-section {
+    display: none; /* Hidden by default, JavaScript will show/hide */
+    animation: fadeIn 0.3s ease-out;
+}
+
+.view-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.view-section h3 {
+    color: #fff;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+}
+
+/* Dashboard specific styles */
+.balance-card {
+    background-color: #2f3136;
+    padding: 25px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.balance-card h4 {
+    color: #8e9297;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+
+.balance-amount {
+    color: #43b581; /* Green for positive balance */
+    font-size: 2.8em;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.quick-actions {
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.action-button {
+    background-color: #5865f2; /* Discord brand color */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1; /* Distribute space evenly */
+}
+
+.action-button:hover {
+    background-color: #4752c4;
+    transform: translateY(-2px);
+}
+
+.action-button:active {
+    transform: translateY(0);
+}
+
+.action-button.small {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    flex: unset; /* Remove flex sizing */
+    width: fit-content;
+}
+
+/* Forms */
+.bank-form {
+    background-color: #2f3136;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #dcddde;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="password"] {
+    width: calc(100% - 20px); /* Account for padding */
+    padding: 12px 10px;
+    background-color: #202225;
+    border: 1px solid #40444b;
+    border-radius: 4px;
+    color: #dcddde;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group input[type="password"]:focus {
+    border-color: #5865f2;
+    background-color: #36393f;
+}
+
+/* Style for file input */
+.form-group input[type="file"] {
+    background-color: #202225;
+    border: 1px solid #40444b;
+    border-radius: 4px;
+    padding: 10px;
+    color: #dcddde;
+    font-size: 1em;
+    width: calc(100% - 20px); /* Adjust width to fit padding */
+    cursor: pointer;
+}
+
+/* Style for the button inside the file input */
+.form-group input[type="file"]::-webkit-file-upload-button {
+    background-color: #5865f2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.form-group input[type="file"]::-webkit-file-upload-button:hover {
+    background-color: #4752c4;
+}
+
+
+.submit-button {
+    background-color: #5865f2;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    width: 100%;
+}
+
+.submit-button:hover {
+    background-color: #4752c4;
+    transform: translateY(-2px);
+}
+
+.submit-button:active {
+    transform: translateY(0);
+}
+
+.form-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 500;
+    display: none; /* Hidden by default */
+}
+
+.form-message.success {
+    background-color: #43b581; /* Green */
+    color: #fff;
+    display: block;
+}
+
+.form-message.error {
+    background-color: #f04747; /* Red */
+    color: #fff;
+    display: block;
+}
+
+/* Ensure messages under settings actions have proper spacing */
+#settings-action-message {
+    margin-top: 15px;
+}
+
+/* Transaction List */
+.transaction-list-container {
+    background-color: #2f3136;
+    border-radius: 8px;
+    padding: 15px;
+    min-height: 150px; /* Ensure some height even when empty */
+    display: flex;
+    flex-direction: column;
+}
+
+.transaction-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar for Transaction List */
+.transaction-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.transaction-list::-webkit-scrollbar-track {
+    background: #2f3136;
+}
+
+.transaction-list::-webkit-scrollbar-thumb {
+    background-color: #202225;
+    border-radius: 4px;
+    border: 2px solid #2f3136;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #40444b;
+    color: #dcddde;
+    font-size: 0.95em;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-info { /* Added this container for type and date */
+    display: flex;
+    flex-direction: column;
+}
+
+.transaction-type {
+    font-weight: 600;
+}
+
+.transaction-date {
+    color: #8e9297;
+    font-size: 0.85em;
+    margin-top: 2px;
+}
+
+
+/* --- NEW: Transaction amount colors based on JS classes --- */
+.transaction-amount.credit {
+    color: #43b581; /* Green for money in (deposit, transfer_in) */
+    font-weight: 600;
+}
+
+.transaction-amount.debit {
+    color: #f04747; /* Red for money out (withdraw, transfer_out) */
+    font-weight: 600;
+}
+/* --- END NEW --- */
+
+
+/* Settings View */
+.settings-group {
+    background-color: #2f3136;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.settings-group h4 {
+    color: #fff;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #40444b;
+    padding-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.settings-group p {
+    color: #dcddde;
+    margin-bottom: 10px;
+    font-size: 0.95em;
+}
+
+.settings-group p span {
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Auth Overlay and Modals */
+.auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    display: none; /* Hidden by default */
+}
+
+.auth-overlay.active {
+    display: flex;
+}
+
+.auth-modal {
+    background-color: #2f3136;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    width: 400px;
+    text-align: center;
+    position: relative;
+    animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.auth-modal h2 {
+    color: #fff;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+
+.auth-tabs {
+    display: flex;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #40444b;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 12px 0;
+    background-color: transparent;
+    border: none;
+    color: #8e9297;
+    font-size: 1.1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    position: relative;
+    overflow: hidden; /* For underline effect */
+}
+
+.auth-tab:hover {
+    color: #dcddde;
+}
+
+.auth-tab.active {
+    color: #fff;
+}
+
+.auth-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; /* Overlap with border */
+    left: 0;
+    width: 100%;
+    background-color: #5865f2;
+    animation: tabUnderline 0.3s forwards;
+    height: 3px; /* Ensure height is set */
+}
+
+
+@keyframes tabUnderline {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+
+.auth-form-container {
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.auth-form-container.active {
+    display: block;
+}
+
+/* Adjust form-group in auth modal for better spacing */
+.auth-modal .form-group {
+    text-align: left;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .sidebar {
+        flex-direction: row;
+        width: 100%;
+        height: auto;
+        padding: 5px 0;
+        justify-content: center;
+        border-bottom: 1px solid #2f3136;
+    }
+
+    .server-list {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 5px;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .server-icon {
+        flex-shrink: 0; /* Prevent shrinking */
+        margin: 0 5px;
+    }
+
+    .server-icon.active::before {
+        height: 4px;
+        width: 80%;
+        top: auto;
+        bottom: -8px;
+        left: 10%; /* Center it */
+        transform: none;
+    }
+
+    .server-icon.bottom-icon {
+        margin-top: 0;
+    }
+
+    .channel-list {
+        width: 100%;
+        height: auto;
+        border-bottom: 1px solid #202225;
+    }
+
+    .channels {
+        display: flex;
+        overflow-x: auto;
+        padding: 0 10px;
+        padding-bottom: 10px;
+    }
+
+    .channel {
+        flex-shrink: 0;
+        margin-right: 10px;
+    }
+
+    .user-panel {
+        display: none; /* Hide on small screens to save space */
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

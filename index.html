@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ธนาคารโรงเรียน Discord UI</title>
+    <link rel="stylesheet" href="../Web/ZeroOne/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="server-list">
+                <div class="server-icon active" data-view="dashboard" title="Dashboard">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="server-icon" data-view="transfer" title="โอนเงิน">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="server-icon" data-view="deposit" title="ฝากเงิน">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="server-icon" data-view="withdraw" title="ถอนเงิน">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="server-icon" data-view="transactions" title="ประวัติธุรกรรม">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div class="server-icon bottom-icon" data-view="settings" title="ตั้งค่า">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="server-icon bottom-icon" id="logout-button" title="ออกจากระบบ">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="channel-list">
+            <div class="channel-header" style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://fth1.com/uppic/10106510/news/10106510_0_20240711-153655.png" alt="โลโก้โรงเรียน" style="width: 32px; height: 32px; border-radius: 5px;">
+                <h3 style="margin: 0;">ธนาคารโรงเรียน</h3>
+            </div>
+
+            <div class="channels">
+                <a href="#" class="channel active" data-view="dashboard">
+                    <i class="fas fa-hashtag"></i>
+                    <span>หน้าหลัก</span>
+                </a>
+                <a href="#" class="channel" data-view="transfer">
+                    <i class="fas fa-hashtag"></i>
+                    <span>โอนเงิน</span>
+                </a>
+                <a href="#" class="channel" data-view="deposit">
+                    <i class="fas fa-hashtag"></i>
+                    <span>ฝากเงิน</span>
+                </a>
+                <a href="#" class="channel" data-view="withdraw">
+                    <i class="fas fa-hashtag"></i>
+                    <span>ถอนเงิน</span>
+                </a>
+                <a href="#" class="channel" data-view="transactions">
+                    <i class="fas fa-hashtag"></i>
+                    <span>ประวัติธุรกรรม</span>
+                </a>
+                <a href="#" class="channel" data-view="settings">
+                    <i class="fas fa-hashtag"></i>
+                    <span>การตั้งค่า</span>
+                </a>
+            </div>
+
+            <div class="user-panel">
+                <img src="https://via.placeholder.com/32/5865f2/ffffff?text=U" alt="User Avatar" class="user-avatar" id="user-panel-avatar">
+                <div class="user-info">
+                    <span id="current-username">Guest</span>
+                    <small></small>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="main-header">
+                <h2 id="current-view-title">แดชบอร์ด</h2>
+            </div>
+
+            <div class="view-section active" id="dashboard-view">
+                <h3>สวัสดี <span id="dashboard-username">Guest</span>!</h3>
+                <div class="balance-card">
+                    <h4>ยอดเงินคงเหลือ</h4>
+                    <p id="account-balance" class="balance-amount">฿ 0.00</p>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="action-button" data-target-view="transfer"><i class="fas fa-exchange-alt"></i> โอนเงิน</button>
+                    <button class="action-button" data-target-view="deposit"><i class="fas fa-money-bill-wave"></i> ฝากเงิน</button>
+                    <button class="action-button" data-target-view="withdraw"><i class="fas fa-dollar-sign"></i> ถอนเงิน</button>
+                </div>
+
+                <h4>ธุรกรรมล่าสุด</h4>
+                <div class="transaction-list-container">
+                    <ul id="dashboard-transactions-list" class="transaction-list"></ul>
+                </div>
+            </div>
+
+            <div class="view-section" id="transfer-view">
+                <h3>โอนเงิน</h3>
+                <form id="transfer-form" class="bank-form">
+                    <div class="form-group">
+                        <label for="to-account-number">เลขบัญชีปลายทาง:</label>
+                        <input type="text" id="to-account-number" required placeholder="เช่น 1234567890">
+                    </div>
+                    <div class="form-group">
+                        <label for="transfer-amount">จำนวนเงิน (บาท):</label>
+                        <input type="number" id="transfer-amount" min="1" step="0.01" required placeholder="เช่น 300.00">
+                    </div>
+                    <button type="submit" class="submit-button">โอนเงิน</button>
+                    <p id="transfer-message" class="form-message"></p>
+                </form>
+            </div>
+
+            <div class="view-section" id="deposit-view">
+                <h3>ฝากเงิน</h3>
+                <form id="deposit-form" class="bank-form">
+                    <div class="form-group">
+                        <label for="deposit-amount">จำนวนเงินที่ต้องการฝาก (บาท):</label>
+                        <input type="number" id="deposit-amount" min="1" step="0.01" required placeholder="เช่น 300.00">
+                    </div>
+                    <button type="submit" class="submit-button">ฝากเงิน</button>
+                    <p id="deposit-message" class="form-message"></p>
+                </form>
+            </div>
+
+            <div class="view-section" id="withdraw-view">
+                <h3>ถอนเงิน</h3>
+                <form id="withdraw-form" class="bank-form">
+                    <div class="form-group">
+                        <label for="withdraw-amount">จำนวนเงินที่ต้องการถอน (บาท):</label>
+                        <input type="number" id="withdraw-amount" min="1" step="0.01" required placeholder="เช่น 300.00">
+                    </div>
+                    <button type="submit" class="submit-button">ถอนเงิน</button>
+                    <p id="withdraw-message" class="form-message"></p>
+                </form>
+            </div>
+
+            <div class="view-section" id="transactions-view">
+                <h3>ประวัติธุรกรรมทั้งหมด</h3>
+                <div class="transaction-list-container">
+                    <ul id="full-transactions-list" class="transaction-list"></ul>
+                    <p id="no-transactions-message" style="display: none; text-align: center; color: #aaa;">ยังไม่มีประวัติการทำธุรกรรม</p>
+                </div>
+            </div>
+
+            <div class="view-section" id="settings-view">
+                <h3>ตั้งค่าความเป็นส่วนตัว</h3>
+                <div class="settings-group">
+                    <h4>ข้อมูลส่วนตัว</h4>
+                    <p>ชื่อผู้ใช้: <span id="setting-username">Guest</span></p>
+                    <p>เลขบัญชี: <span id="setting-account-number">N/A</span></p>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="profile-picture-upload">รูปโปรไฟล์:</label>
+                        <input type="file" id="profile-picture-upload" accept="image/*">
+                        <p class="form-message" id="profile-upload-message"></p>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h4>ความปลอดภัย</h4>
+                    <button class="action-button small" onclick="window.location.href='mailto:ntun21933@ntun.ac.th?subject=ติดต่อธนาคารโรงเรียน&body=กรุณาพิมพ์ข้อความของคุณที่นี่'">ติดต่อเรา</button>
+                    <p class="form-message" id="settings-action-message"></p>
+                </div>
+                <div class="settings-group">
+                    <h4>เกี่ยวกับเว็ป</h4>
+                    <p>เวอร์ชั่น: 1.0.0 (Bata)</p>
+                    <p>พัฒนาโดย: ZERO : ONE</p>
+                </div>
+            </div>
+
+            <div id="auth-overlay" class="auth-overlay active">
+                <div class="auth-modal">
+                    <h2>ยินดีต้อนรับสู่ธนาคารโรงเรียน</h2>
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" id="login-tab">เข้าสู่ระบบ</button>
+                        <button class="auth-tab" id="register-tab">สมัครสมาชิก</button>
+                    </div>
+
+                    <div id="login-form-container" class="auth-form-container active">
+                        <form id="login-form">
+                            <div class="form-group">
+                                <label for="login-username">ชื่อผู้ใช้:</label>
+                                <input type="text" id="login-username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">รหัสผ่าน:</label>
+                                <input type="password" id="login-password" required>
+                            </div>
+                            <button type="submit" class="submit-button">เข้าสู่ระบบ</button>
+                            <p id="login-message" class="form-message"></p>
+                        </form>
+                    </div>
+
+                    <div id="register-form-container" class="auth-form-container">
+                        <form id="register-form">
+                            <div class="form-group">
+                                <label for="register-username">ชื่อผู้ใช้:</label>
+                                <input type="text" id="register-username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password">รหัสผ่าน:</label>
+                                <input type="password" id="register-password" required>
+                            </div>
+                            <button type="submit" class="submit-button">สมัครสมาชิก</button>
+                            <p id="register-message" class="form-message"></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="../Web/ZeroOne/script.js"></script>
+</body>
+</html>
