@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NtunBank</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -157,30 +156,27 @@
                     <p>ชื่อผู้ใช้: <span id="setting-username">Guest</span></p>
                     <p>เลขบัญชี: <span id="setting-account-number">N/A</span></p>
 
-                    <div class="form-group" style="margin-top: 20px;">
+                    <div class="setting-item">
                         <label for="profile-picture-upload">รูปโปรไฟล์:</label>
                         <input type="file" id="profile-picture-upload" accept="image/*">
-                        <p class="form-message" id="profile-upload-message"></p>
+                        <p id="profile-upload-message" class="form-message" style="margin-top: 10px;"></p>
                     </div>
-                </div>
-                <div class="settings-group">
-                    <h4>ความปลอดภัย</h4>
-                    <button class="action-button small" onclick="window.location.href='mailto:ntun21933@ntun.ac.th?subject=ติดต่อธนาคารโรงเรียน&body=กรุณาพิมพ์ข้อความของคุณที่นี่'">ติดต่อเรา</button>
-                    <p class="form-message" id="settings-action-message"></p>
-                </div>
-                <div class="settings-group">
-                    <h4>เกี่ยวกับเว็ป</h4>
-                    <p>เวอร์ชั่น: 1.0.0 (Bata)</p>
-                    <p>พัฒนาโดย: ZERO : ONE</p>
+
+                    <div class="setting-item">
+                        <button id="reset-password-button" class="action-button small">รีเซ็ตรหัสผ่าน</button>
+                    </div>
+                    <div class="setting-item">
+                        <button id="manage-devices-button" class="action-button small">จัดการอุปกรณ์ที่เข้าสู่ระบบ</button>
+                    </div>
+                    <p id="settings-action-message" class="form-message"></p>
                 </div>
             </div>
 
-            <div id="auth-overlay" class="auth-overlay active">
+            <div class="auth-overlay active" id="auth-overlay">
                 <div class="auth-modal">
-                    <h2>ยินดีต้อนรับสู่ธนาคารโรงเรียน</h2>
                     <div class="auth-tabs">
-                        <button class="auth-tab active" id="login-tab">เข้าสู่ระบบ</button>
-                        <button class="auth-tab" id="register-tab">สมัครสมาชิก</button>
+                        <button class="tab-button active" id="login-tab">เข้าสู่ระบบ</button>
+                        <button class="tab-button" id="register-tab">สมัครสมาชิก</button>
                     </div>
 
                     <div id="login-form-container" class="auth-form-container active">
@@ -217,6 +213,6 @@
 
         </div>
     </div>
-    <script src="script.js"></script>
-</body>
+
+    <script src="script.js"></script> </body>
 </html>
