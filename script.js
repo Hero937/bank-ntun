@@ -48,9 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let transactionChart = null; // To store the Chart.js instance
 
     // --- Mock Database (for demonstration only, not persistent) ---
-    // โหลดข้อมูลผู้ใช้จาก localStorage หรือเริ่มต้นเป็น object ว่าง
-    let users = JSON.parse(localStorage.getItem('bankUsers')) || {};
-    // โหลดข้อมูลผู้ใช้ที่เข้าสู่ระบบปัจจุบันจาก localStorage
+    let users = JSON.parse(localStorage.getItem('bankUsers')) || {}; // Store users in localStorage
     let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
     // Helper to generate a simple account number (for demonstration)
@@ -88,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Special handling for transactions view
         if (viewId === 'transactions') {
             renderFullTransactions();
-            renderTransactionChart(); // เรียกใช้เมื่อเข้าสู่หน้าประวัติการทำธุรกรรม
+            renderTransactionChart(); // NEW: เรียกใช้เมื่อเข้าสู่หน้าประวัติการทำธุรกรรม
         } else if (viewId === 'settings') { // เรียก renderSettings เมื่อเข้าสู่หน้าตั้งค่า
             renderSettings();
         }
@@ -236,25 +234,24 @@ document.addEventListener('DOMContentLoaded', () => {
         // เตรียมข้อมูลสำหรับกราฟ
         const labels = sortedTransactions.map(t => new Date(t.date).toLocaleDateString('th-TH', { day: '2-digit', month: 'short' }));
         const dataPoints = [];
-        
+        // คำนวณยอดคงเหลือ ณ แต่ละจุดของธุรกรรม
+        // เริ่มต้นด้วยยอดเงินปัจจุบันของ user
+        let currentBalanceForChart = currentUser.balance; 
+
+        // หากต้องการแสดงประวัติยอดคงเหลือแบบสะสมตั้งแต่แรก
+        // จะต้องคำนวณย้อนกลับจาก balance ปัจจุบัน หรือเริ่มต้นจาก 0
+        // วิธีที่ง่ายกว่าคือแสดงแนวโน้มการเปลี่ยนแปลงตามลำดับธุรกรรม
+        // ดังนั้น เราจะใช้ logic ที่คำนวณยอดเงินสะสมจาก 0 (หรือ initialBalance)
+        // เพื่อให้กราฟแสดงแนวโน้มที่สอดคล้องกันจากจุดเริ่มต้นของประวัติ
+
+        // เพื่อให้กราฟแสดงยอดเงินคงเหลือ 'ที่แท้จริง' ในแต่ละจุดเวลา
+        // เราจำเป็นต้องมีข้อมูลยอดเงิน 'ก่อน' ธุรกรรมแรก หรือคำนวณย้อนหลัง
+        // สำหรับวัตถุประสงค์ของการแสดง "กราฟขึ้นลง" อย่างง่าย
+        // เราจะคำนวณยอดเงินสะสมตามลำดับธุรกรรม โดยให้ยอดเงินเริ่มต้นเป็น 0
+        // (หรือจะสมมติยอดเงินเริ่มต้นของบัญชีเป็น 0 ตอนสมัคร)
+        // หรือให้เริ่มต้นด้วยยอดเงินของ currentUser.balance ก่อนธุรกรรมทั้งหมด
+        // วิธีที่เข้าใจง่ายคือสร้างยอดเงินสะสมจาก 0
         let cumulativeBalance = 0;
-        // หากมีผู้ใช้อยู่ ให้เริ่มต้น cumulativeBalance ด้วยยอดเงินปัจจุบันของผู้ใช้
-        // เพื่อให้กราฟแสดงยอดเงินจริงจากจุดเริ่มต้นของประวัติ (ย้อนหลังไป)
-        // หรือถ้าต้องการกราฟที่แสดงยอดเงิน 'หลังจาก' แต่ละธุรกรรม
-        // เราสามารถคำนวณยอดเงินสะสมจาก 0 หรือยอดเงินเริ่มต้นบัญชี
-        // สำหรับวัตถุประสงค์นี้ เราจะแสดงแนวโน้มโดยบวก/ลบจาก 0
-        // (หรือจะใช้ยอดเงินเริ่มต้นที่ 0 และปรับไปเรื่อยๆ)
-
-        // เพื่อให้กราฟแสดงยอดเงินคงเหลือ ณ แต่ละจุดเวลาจริง ๆ
-        // เราจะคำนวณยอดเงินสะสมจากยอดเงินเริ่มต้นของบัญชี
-        // ถ้าไม่มีธุรกรรม หรือต้องการให้กราฟเริ่มต้นจาก 0
-        // ให้กำหนด cumulativeBalance = 0;
-        // แต่ถ้าต้องการให้เป็นยอดจริง ณ แต่ละจุด ควรเก็บยอดเงินปัจจุบัน
-        // หรือคำนวณย้อนหลัง
-
-        // สำหรับกราฟแนวโน้มนี้ เราจะใช้ cumulativeBalance โดยเริ่มจาก 0 แล้วบวก/ลบตามธุรกรรม
-        // (ซึ่งจะแตกต่างจาก balance จริง หากมีเงินเริ่มต้นบัญชีอยู่แล้ว)
-        // เพื่อให้กราฟแสดงการเปลี่ยนแปลงสะสม
         sortedTransactions.forEach(transaction => {
             if (transaction.type === 'deposit' || transaction.type === 'transfer_in') {
                 cumulativeBalance += transaction.amount;
@@ -264,6 +261,12 @@ document.addEventListener('DOMContentLoaded', () => {
             dataPoints.push(cumulativeBalance);
         });
         
+        // หากต้องการให้กราฟเริ่มต้นจากยอดเงินปัจจุบันจริงๆ และย้อนหลังไป
+        // ต้องหาจุดเริ่มต้นของกราฟจาก transactions array
+        // ถ้าต้องการกราฟที่แสดงยอดเงิน ณ แต่ละช่วงเวลาจริง ๆ ควรเก็บ balance_after_transaction
+        // หรือคำนวณย้อนกลับ
+        // สำหรับตัวอย่างนี้ จะแสดงแนวโน้มโดยเริ่มต้นจาก 0 และบวก/ลบไปเรื่อยๆ
+
         const ctx = transactionChartCanvas.getContext('2d');
         transactionChart = new Chart(ctx, {
             type: 'line', // กราฟเส้นสำหรับแสดงแนวโน้ม
@@ -367,41 +370,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // Login function
     const login = (username, password) => {
         const user = users[username];
-        if (user && user.password === password) { // ตรวจสอบชื่อผู้ใช้และรหัสผ่าน
-            currentUser = { ...user }; // Copy user data
-            localStorage.setItem('currentUser', JSON.stringify(currentUser)); // บันทึกผู้ใช้ปัจจุบันลง localStorage
-            updateUserDetailsUI(); // อัปเดต UI
-            showMessage(loginMessage, 'เข้าสู่ระบบสำเร็จ!', true); // แสดงข้อความ
+        if (user && user.password === password) {
+            currentUser = { ...user
+            }; // Copy user data
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateUserDetailsUI();
+            showMessage(loginMessage, 'เข้าสู่ระบบสำเร็จ!', true); // Use common showMessage
             setTimeout(() => {
-                if (authOverlay) authOverlay.classList.remove('active'); // ซ่อนหน้าล็อกอิน/สมัครสมาชิก
-                showView('dashboard'); // แสดงหน้า Dashboard หลังจากเข้าสู่ระบบสำเร็จ
-            }, 500);
+                if (authOverlay) authOverlay.classList.remove('active');
+            }, 500); // Shorter delay for UI to feel snappier
             return true;
         } else {
-            showMessage(loginMessage, 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', false); // แสดงข้อความผิดพลาด
+            showMessage(loginMessage, 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', false); // Use common showMessage
             return false;
         }
     };
 
     // Register function
     const register = (username, password) => {
-        if (users[username]) { // ตรวจสอบว่าชื่อผู้ใช้มีอยู่แล้วหรือไม่
-            showMessage(registerMessage, 'ชื่อผู้ใช้นี้มีอยู่แล้ว', false);
+        if (users[username]) {
+            showMessage(registerMessage, 'ชื่อผู้ใช้นี้มีอยู่แล้ว', false); // Use common showMessage
             return false;
         }
 
-        const newAccountNumber = generateAccountNumber(); // สร้างเลขบัญชีใหม่
-        users[username] = { // สร้างข้อมูลผู้ใช้ใหม่
+        const newAccountNumber = generateAccountNumber();
+        users[username] = {
             username: username,
-            password: password, // ในระบบจริง ควรจะ Hash รหัสผ่านก่อนเก็บ
+            password: password,
             accountNumber: newAccountNumber,
             balance: 0,
             transactions: [],
             profilePicture: null // เพิ่ม property สำหรับเก็บรูปโปรไฟล์
         };
-        localStorage.setItem('bankUsers', JSON.stringify(users)); // บันทึกผู้ใช้ลง localStorage
-        showMessage(registerMessage, `สมัครสมาชิกสำเร็จ! เลขบัญชีของคุณ: ${newAccountNumber}`, true);
-        // สลับไปหน้าล็อกอินหลังจากสมัครสมาชิกสำเร็จ
+        localStorage.setItem('bankUsers', JSON.stringify(users));
+        showMessage(registerMessage, `สมัครสมาชิกสำเร็จ! เลขบัญชีของคุณ: ${newAccountNumber}`, true); // Use common showMessage
+        // Switch to login tab after successful registration
         setTimeout(() => {
             if (loginTab) loginTab.click(); // Programmatically click login tab
             const loginUsernameInput = document.getElementById('login-username');
@@ -412,23 +415,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Logout function
     const logout = () => {
-        currentUser = null; // ล้างผู้ใช้ปัจจุบัน
-        localStorage.removeItem('currentUser'); // ลบข้อมูลผู้ใช้ปัจจุบันออกจาก localStorage
-        updateUserDetailsUI(); // อัปเดต UI
-        // ล้างฟอร์มทั้งหมดเมื่อออกจากระบบ
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        updateUserDetailsUI();
+        // Clear all form inputs on logout
         if (loginForm) loginForm.reset();
         if (registerForm) registerForm.reset();
         if (transferForm) transferForm.reset();
         if (depositForm) depositForm.reset();
         if (withdrawForm) withdrawForm.reset();
-        // ล้างข้อความแจ้งเตือนทั้งหมด
+        // Clear all messages
         document.querySelectorAll('.form-message').forEach(msg => {
             msg.style.display = 'none';
             msg.textContent = '';
         });
-        if (authOverlay) authOverlay.classList.add('active'); // แสดงหน้าล็อกอิน/สมัครสมาชิก
-        if (loginTab) loginTab.click(); // ตั้งค่าเริ่มต้นเป็นแท็บเข้าสู่ระบบ
-        // ทำลายกราฟเมื่อ Logout
+        if (authOverlay) authOverlay.classList.add('active'); // Show login/register screen
+        if (loginTab) loginTab.click(); // Default to login tab
+        // NEW: ทำลายกราฟเมื่อ Logout
         if (transactionChart) {
             transactionChart.destroy();
             transactionChart = null;
@@ -448,20 +451,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        currentUser.balance += amount; // เพิ่มยอดเงิน
-        currentUser.transactions.push({ // เพิ่มรายการธุรกรรม
+        currentUser.balance += amount;
+        currentUser.transactions.push({
             type: 'deposit',
             amount: amount,
             date: new Date().toISOString()
         });
-        users[currentUser.username] = { ...currentUser }; // อัปเดตผู้ใช้ใน "ฐานข้อมูล"
-        localStorage.setItem('bankUsers', JSON.stringify(users)); // บันทึกผู้ใช้ทั้งหมดลง localStorage
-        localStorage.setItem('currentUser', JSON.stringify(currentUser)); // อัปเดตผู้ใช้ปัจจุบันใน localStorage
+        users[currentUser.username] = { ...currentUser
+        }; // Update user in mock DB
+        localStorage.setItem('bankUsers', JSON.stringify(users));
+        localStorage.setItem('currentUser', JSON.stringify(currentUser)); // Update current user in localStorage
 
-        updateUserDetailsUI(); // อัปเดต UI
+        updateUserDetailsUI();
         showMessage(depositMessage, `ฝากเงิน ${amount.toFixed(2)} บาท สำเร็จ!`, true);
-        if (depositForm) depositForm.reset(); // ล้างฟอร์ม
-        renderTransactionChart(); // อัปเดตกราฟหลังทำธุรกรรม
+        if (depositForm) depositForm.reset();
+        renderTransactionChart(); // NEW: อัปเดตกราฟหลังทำธุรกรรม
     };
 
     // Withdraw
@@ -479,20 +483,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        currentUser.balance -= amount; // ลดยอดเงิน
-        currentUser.transactions.push({ // เพิ่มรายการธุรกรรม
+        currentUser.balance -= amount;
+        currentUser.transactions.push({
             type: 'withdraw',
             amount: amount,
             date: new Date().toISOString()
         });
-        users[currentUser.username] = { ...currentUser };
+        users[currentUser.username] = { ...currentUser
+        };
         localStorage.setItem('bankUsers', JSON.stringify(users));
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
         updateUserDetailsUI();
         showMessage(withdrawMessage, `ถอนเงิน ${amount.toFixed(2)} บาท สำเร็จ!`, true);
         if (withdrawForm) withdrawForm.reset();
-        renderTransactionChart(); // อัปเดตกราฟหลังทำธุรกรรม
+        renderTransactionChart(); // NEW: อัปเดตกราฟหลังทำธุรกรรม
     };
 
     // Transfer
@@ -533,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser.transactions.push({
             type: 'transfer_out',
             amount: amount,
-            toAccount: recipient.accountNumber,
+            toAccount: toAccountNumber,
             date: now
         });
         recipient.transactions.push({
@@ -543,47 +548,42 @@ document.addEventListener('DOMContentLoaded', () => {
             date: now
         });
 
-        users[currentUser.username] = { ...currentUser }; // Update sender
-        users[recipientUsername] = { ...recipient }; // Update receiver
+        users[currentUser.username] = { ...currentUser
+        };
+        users[recipient.username] = { ...recipient
+        }; // Update recipient in mock DB
         localStorage.setItem('bankUsers', JSON.stringify(users));
         localStorage.setItem('currentUser', JSON.stringify(currentUser)); // Update current user in localStorage
 
         updateUserDetailsUI();
-        showMessage(transferMessage, `โอนเงิน ${amount.toFixed(2)} บาท ไปยัง ${recipient.username} สำเร็จ!`, true);
+        showMessage(transferMessage, `โอนเงิน ${amount.toFixed(2)} บาท ไปยัง ${toAccountNumber} สำเร็จ!`, true);
         if (transferForm) transferForm.reset();
-        renderTransactionChart(); // อัปเดตกราฟหลังทำธุรกรรม
+        renderTransactionChart(); // NEW: อัปเดตกราฟหลังทำธุรกรรม
     };
+
 
     // --- Event Listeners ---
 
-    // Tab switching for login/register
+    // Auth tab switching
     if (loginTab) {
         loginTab.addEventListener('click', () => {
             loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-            loginFormContainer.classList.add('active');
-            registerFormContainer.classList.remove('active');
-            // Clear messages when switching tabs
-            loginMessage.style.display = 'none';
-            registerMessage.style.display = 'none';
-            loginMessage.textContent = '';
-            registerMessage.textContent = '';
-            registerForm.reset(); // Clear register form
+            if (registerTab) registerTab.classList.remove('active');
+            if (loginFormContainer) loginFormContainer.classList.add('active');
+            if (registerFormContainer) registerFormContainer.classList.remove('active');
+            if (loginMessage) loginMessage.style.display = 'none';
+            if (registerMessage) registerMessage.style.display = 'none';
         });
     }
 
     if (registerTab) {
         registerTab.addEventListener('click', () => {
             registerTab.classList.add('active');
-            loginTab.classList.remove('active');
-            registerFormContainer.classList.add('active');
-            loginFormContainer.classList.remove('active');
-            // Clear messages when switching tabs
-            loginMessage.style.display = 'none';
-            registerMessage.style.display = 'none';
-            loginMessage.textContent = '';
-            registerMessage.textContent = '';
-            loginForm.reset(); // Clear login form
+            if (loginTab) loginTab.classList.remove('active');
+            if (registerFormContainer) registerFormContainer.classList.add('active');
+            if (loginFormContainer) loginFormContainer.classList.remove('active');
+            if (loginMessage) loginMessage.style.display = 'none';
+            if (registerMessage) registerMessage.style.display = 'none';
         });
     }
 
@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const username = document.getElementById('login-username').value.trim();
+            const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
             login(username, password);
         });
@@ -601,62 +601,56 @@ document.addEventListener('DOMContentLoaded', () => {
     if (registerForm) {
         registerForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const username = document.getElementById('register-username').value.trim();
+            const username = document.getElementById('register-username').value;
             const password = document.getElementById('register-password').value;
             register(username, password);
         });
     }
 
-    // Sidebar icon and channel link clicks
-    sidebarIcons.forEach(icon => {
-        icon.addEventListener('click', () => {
-            const view = icon.dataset.view;
-            if (view === 'logout') {
-                logout();
-            } else if (currentUser) {
-                showView(view);
-            } else {
-                showMessage(loginMessage, 'กรุณาเข้าสู่ระบบก่อน', false); // Can display on login form if not logged in
-                if (authOverlay) authOverlay.classList.add('active');
-                if (loginTab) loginTab.click();
-            }
-        });
-    });
-
-    channelLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent default link behavior
-            const view = link.dataset.view;
-            if (currentUser) {
-                showView(view);
-            } else {
-                showMessage(loginMessage, 'กรุณาเข้าสู่ระบบก่อน', false); // Can display on login form if not logged in
-                if (authOverlay) authOverlay.classList.add('active');
-                if (loginTab) loginTab.click();
-            }
-        });
+    // Navigation (Sidebar Icons and Channel Links)
+    [...sidebarIcons, ...channelLinks].forEach(element => {
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default link behavior
+                if (currentUser) { // Only allow navigation if logged in
+                    const viewId = element.dataset.view;
+                    if (viewId) {
+                        showView(viewId);
+                    }
+                } else {
+                    alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');
+                    if (authOverlay) authOverlay.classList.add('active'); // Show login if not logged in
+                }
+            });
+        }
     });
 
     // Quick action buttons on dashboard
     quickActionButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const targetView = button.dataset.targetView;
-            if (currentUser) {
-                showView(targetView);
-            } else {
-                showMessage(loginMessage, 'กรุณาเข้าสู่ระบบก่อน', false);
-                if (authOverlay) authOverlay.classList.add('active');
-                if (loginTab) loginTab.click();
-            }
-        });
+        if (button) {
+            button.addEventListener('click', () => {
+                const targetView = button.dataset.targetView;
+                if (targetView && currentUser) {
+                    showView(targetView);
+                } else if (!currentUser) {
+                    alert('กรุณาเข้าสู่ระบบก่อนทำรายการ');
+                    if (authOverlay) authOverlay.classList.add('active');
+                }
+            });
+        }
     });
 
-    // Logout button in sidebar
+
+    // Logout button
     if (logoutButton) {
-        logoutButton.addEventListener('click', logout);
+        logoutButton.addEventListener('click', () => {
+            if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
+                logout();
+            }
+        });
     }
 
-    // Form Submissions for Bank Operations
+    // Bank Operation Form Submissions
     if (depositForm) {
         depositForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -676,25 +670,46 @@ document.addEventListener('DOMContentLoaded', () => {
     if (transferForm) {
         transferForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const toAccountNumber = document.getElementById('to-account-number').value.trim();
+            const toAccount = document.getElementById('to-account-number').value;
             const amount = parseFloat(document.getElementById('transfer-amount').value);
-            handleTransfer(toAccountNumber, amount);
+            handleTransfer(toAccount, amount);
         });
     }
 
-    // Event Listener for Profile Picture Upload
+    // --- เพิ่ม Event Listeners ใหม่สำหรับรูปโปรไฟล์และปุ่มตั้งค่า ---
+
+    // Event Listener สำหรับการอัปโหลดรูปโปรไฟล์
     if (profilePictureUpload) {
-        profilePictureUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file && currentUser) {
+        profilePictureUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // ตรวจสอบชนิดไฟล์ (อนุญาตเฉพาะรูปภาพ)
+                if (!file.type.startsWith('image/')) {
+                    showMessage(profileUploadMessage, 'กรุณาเลือกไฟล์รูปภาพเท่านั้น', false);
+                    e.target.value = ''; // Clear the input
+                    return;
+                }
+
+                // จำกัดขนาดไฟล์ไม่เกิน 2MB (2 * 1024 * 1024 bytes)
+                if (file.size > 2 * 1024 * 1024) {
+                    showMessage(profileUploadMessage, 'ขนาดรูปใหญ่เกินไป (สูงสุด 2MB)', false);
+                    e.target.value = ''; // Clear the input
+                    return;
+                }
+
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    currentUser.profilePicture = e.target.result; // Store as Data URL
-                    users[currentUser.username] = { ...currentUser };
-                    localStorage.setItem('bankUsers', JSON.stringify(users));
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    updateUserDetailsUI(); // Update avatar in UI
-                    showMessage(profileUploadMessage, 'อัปโหลดรูปโปรไฟล์สำเร็จ!', true);
+                reader.onload = (event) => {
+                    const imageDataUrl = event.target.result;
+                    if (currentUser) {
+                        currentUser.profilePicture = imageDataUrl; // บันทึกรูปในรูปแบบ Data URL
+                        users[currentUser.username] = { ...currentUser
+                        }; // Update user in mock DB
+                        localStorage.setItem('bankUsers', JSON.stringify(users));
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser)); // Update current user in localStorage
+
+                        updateUserDetailsUI(); // อัปเดต UI ทันที
+                        showMessage(profileUploadMessage, 'อัปโหลดรูปโปรไฟล์สำเร็จ!', true);
+                    }
                 };
                 reader.onerror = () => {
                     showMessage(profileUploadMessage, 'เกิดข้อผิดพลาดในการอ่านไฟล์', false);
@@ -733,6 +748,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (authOverlay) authOverlay.classList.add('active'); // Show login/register if no current user
         if (loginTab) loginTab.click(); // Default to login tab
     } else {
-        showView('dashboard'); // Show dashboard if already logged in
+        showView('dashboard'); // If logged in, show dashboard
     }
 });
